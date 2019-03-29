@@ -8,92 +8,85 @@
             border: 1px solid black;
         }
     </style>
+    <script src="hcGame.js"></script>
+    <script src="ball.js"></script>
+    <script src="paddle.js"></script>
+    <script src="block.js"></script>
 </head>
 <body>
-    <canvas id="games" width="250" height="250"></canvas>
+    <canvas id="games" width="400" height="250"></canvas>
     <script>
-
-        var imageFrampath = function(image) {
-            var img = new Image()
-            img.src = image
-            return img
+        class Gameobject {
+            constructor (image, x, y) {
+                this.x = x
+                this.y = y
+                this.action = false
+                this.image = this.imageFrampath(image)
+            }
+            imageFrampath (image) {
+                var img = new Image()
+                img.src = image
+                return img
+            }
         }
 
-        var Paddle = function() {
-            var image = imageFrampath('myImage.png')
-            var p = {
-                image: image,
-                x: 100,
-                y: 200,
-                speed: 5,
-            }
-            p.moveLeft = function() {
-                this.x -= this.speed
-            }
-            p.moveRight = function() {
-                this.x += this.speed
-            }
-            return p
-        }
-
-        var hcGame = function() {
-            var g = {
-                actions: {},
-                keydowns: {},
-            }
-            var canvas = document.querySelector('#games')
-            var contents = canvas.getContext('2d')
-            g.canvas = canvas
-            g.contents = contents
-            window.addEventListener('keydown', function(event) {
-                g.keydowns[event.key] = true
-            })
-            window.addEventListener('keyup', function(event) {
-                g.keydowns[event.key] = false
-            })
-            g.register = function(key, callback) {
-                this.actions[key] = callback
-            }
-            g.drawIamge = function(paddle) {
-                this.contents.drawImage(paddle.image, paddle.x, paddle.y)
-            }
-            setInterval(function() {
-                //开始移动
-                g.update()
-                var actions = Object.keys(g.actions)
-                for (var i = 0; i < actions.length; i++) {
-                    var action = actions[i]
-                    if(g.keydowns[action]) {
-                        g.actions[action]()
-                    }
+        var aInb = function(p, b) {
+            if((b.x < p.x && b.x + b.image.width > p.x) || (b.x < p.x + p.image.width && b.x + b.image.width > p.x + p.image.width)) {
+                if((b.y < p.y && b.y + b.image.height > p.y) || (b.y < p.y + p.image.height && b.y + b.image.height > p.y + p.image.height)) {
+                    return true
                 }
-                //清除
-                g.contents.clearRect(0, 0, g.canvas.width, g.canvas.height)
-                //重新画
-                g.draw()
-
-            }, 1000/30)
-            return g
+            }
+            return false
         }
 
-        var ball = function() {
-            
-        }
-        
         var _main = function() {
             var paddle = Paddle()
-            var game = hcGame()
-            var ball = ball()
+            var ball = Ball()
+            var blocks = []
+            var game = hcGame(30)
+            var paused = false
+            for (var i = 0; i < 3; i++) {
+                var block = Block(i*150, 50)
+                blocks.push(block)
+            }
+
             game.update = function() {
+                if(!paused) {
+                    ball.move()
+                }
+                if(paddle.colide(ball)) {
+                    ball.rebound()
+                }
+                blocks.forEach(function(block) {
+                    if(block.colide(ball)) {
+                        block.kill()
+                        //反弹函数
+                        ball.rebound()
+                    }
+                })
             }
             game.draw = function() {
                 game.drawIamge(paddle)
+                game.drawIamge(ball)
+                blocks.forEach(function(block) {
+                    if(block.alive) {
+                        game.drawIamge(block)
+                    }
+                })
             }
             game.register('a', function() {
                 paddle.moveLeft()
             })
             game.register('d', function() {
                 paddle.moveRight()
+            })
+            game.register('f', function() {
+                ball.ballFire()
+            })
+            window.addEventListener('keydown', function(event) {
+                if(event.key == 'p') {
+                    paused = !paused
+                }
             })
         }
         _main()
