@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        #games {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="games" width="250" height="250"></canvas>
+    <script>
+
+        var imageFrampath = function(image) {
+            var img = new Image()
+            img.src = image
+            return img
+        }
+
+        var Paddle = function() {
+            var image = imageFrampath('myImage.png')
+            var p = {
+                image: image,
+                x: 100,
+                y: 200,
+                speed: 5,
+            }
+            p.moveLeft = function() {
+                this.x -= this.speed
+            }
+            p.moveRight = function() {
+                this.x += this.speed
+            }
+            return p
+        }
+
+        var hcGame = function() {
+            var g = {
+                actions: {},
+                keydowns: {},
+            }
+            var canvas = document.querySelector('#games')
+            var contents = canvas.getContext('2d')
+            g.canvas = canvas
+            g.contents = contents
+            window.addEventListener('keydown', function(event) {
+                g.keydowns[event.key] = true
+            })
+            window.addEventListener('keyup', function(event) {
+                g.keydowns[event.key] = false
+            })
+            g.register = function(key, callback) {
+                this.actions[key] = callback
+            }
+            g.drawIamge = function(paddle) {
+                this.contents.drawImage(paddle.image, paddle.x, paddle.y)
+            }
+            setInterval(function() {
+                //开始移动
+                g.update()
+                var actions = Object.keys(g.actions)
+                for (var i = 0; i < actions.length; i++) {
+                    var action = actions[i]
+                    if(g.keydowns[action]) {
+                        g.actions[action]()
+                    }
+                }
+                //清除
+                g.contents.clearRect(0, 0, g.canvas.width, g.canvas.height)
+                //重新画
+                g.draw()
+
+            }, 1000/30)
+            return g
+        }
+
+        var _main = function() {
+            var paddle = Paddle()
+            var game = hcGame()
+            game.update = function() {
+            }
+            game.draw = function() {
+                game.drawIamge(paddle)
+            }
+            game.register('a', function() {
+                paddle.moveLeft()
+            })
+            game.register('d', function() {
+                paddle.moveRight()
+            })
+        }
+        _main()
+    </script>
+</body>
+</html>
