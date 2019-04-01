@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        #games {
+            border: 1px solid black;
+        }
+    </style>
+    <script src="utils.js"></script>
+    <script src="hcGame.js"></script>
+    <script src="ball.js"></script>
+    <script src="paddle.js"></script>
+    <script src="levels.js"></script>
+    <script src="block.js"></script>
+</head>
+<body>
+<canvas id="games" width="400" height="250"></canvas>
+<script>
+    var blocks = []
+    var paused = false
+    var loadLever = function(n) {
+        n = n - 1
+        var level = levels[n]
+        var blocks = []
+        for(var i = 0; i < level.length; i++) {
+            var p = level[i]
+            var block = Block(p)
+            blocks.push(block)
+        }
+        return blocks
+    }
+    var enableDebug = function(enable) {
+        if(!enable) {
+            return false
+        }
+        window.addEventListener('keydown', function(event) {
+            var k = event.key
+            if(k == 'p') {
+                paused = !paused
+            } else if('12346789'.includes(k)) {
+                blocks = loadLever(Number(k))
+            }
+        })
+    }
+    var _main = function() {
+        var paddle = Paddle()
+        var ball = Ball()
+        var game = hcGame(30)
+        blocks = loadLever(3)
+        game.update = function() {
+            if(!paused) {
+                ball.move()
+            }
+            if(paddle.colide(ball)) {
+                ball.rebound()
+            }
+            blocks.forEach(function(block) {
+                if(block.colide(ball)) {
+                    block.kill()
+                    //反弹函数
+                    ball.rebound()
+                }
+            })
+        }
+        game.draw = function() {
+            game.drawIamge(paddle)
+            game.drawIamge(ball)
+            blocks.forEach(function(block) {
+                if(block.alive) {
+                    game.drawIamge(block)
+                }
+            })
+        }
+        game.register('a', function() {
+            paddle.moveLeft()
+        })
+        game.register('d', function() {
+            paddle.moveRight()
+        })
+        game.register('f', function() {
+            ball.ballFire()
+        })
+        enableDebug(true)
+    }
+    _main()
+</script>
+</body>
+</html>
