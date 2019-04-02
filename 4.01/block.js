@@ -11,7 +11,7 @@ var Block = function(b) {
     }
     p.colide = function(b) {
         if(this.alive) {
-            return aInb(p, b)
+            return aInb(p, b) || aInb(b, p)
         }
     }
     return p

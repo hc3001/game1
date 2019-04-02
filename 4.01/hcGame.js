@@ -1,4 +1,4 @@
-var hcGame = function(fps) {
+var hcGame = function() {
     var g = {
         actions: {},
         keydowns: {},
@@ -25,7 +25,6 @@ var hcGame = function(fps) {
     window.fps = 30
     var runLoop = function() {
         //开始移动
-        console.log(window.fps)
         g.update()
         var actions = Object.keys(g.actions)
         for (var i = 0; i < actions.length; i++) {
@@ -45,21 +44,5 @@ var hcGame = function(fps) {
     setTimeout(function() {
         runLoop()
     }, 1000/fps)
-    // setInterval(function() {
-    //     //开始移动
-    //     g.update()
-    //     var actions = Object.keys(g.actions)
-    //     for (var i = 0; i < actions.length; i++) {
-    //         var action = actions[i]
-    //         if(g.keydowns[action]) {
-    //             g.actions[action]()
-    //         }
-    //     }
-    //     //清除
-    //     g.contents.clearRect(0, 0, g.canvas.width, g.canvas.height)
-    //     //重新画
-    //     g.draw()
-    //
-    // }, 1000/fps)
     return g
 }

@@ -1,5 +1,5 @@
 var Paddle = function() {
-    var p = new Gameobject('myImage.png', 100, 200)
+    var p = new Gameobject('paddle.png', 100, 220)
     p.speed = 10
     p.moveLeft = function() {
         this.x -= this.speed
@@ -14,12 +14,7 @@ var Paddle = function() {
         }
     }
     p.colide = function(ball) {
-        if(this.x < ball.x + ball.image.width && this.x + this.image.width > ball.x) {
-            if(this.y < ball.y + ball.image.height) {
-                return true
-            }
-        }
-        return false
+        return aInb(p, ball) || aInb(ball, p)
     }
     return p
 }
