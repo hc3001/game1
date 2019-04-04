@@ -1,7 +1,10 @@
-var hcGame = function() {
+var hcGame = function(images, runCallback) {
+    // images 是一个对象, 里面是图片的引用名字和图片路径
     var g = {
+        scene: null,
         actions: {},
         keydowns: {},
+        images: {},
     }
     var canvas = document.querySelector('#games')
     var contents = canvas.getContext('2d')
@@ -22,6 +25,13 @@ var hcGame = function() {
     g.clearImage = function(p) {
         this.contents.clearRect(p.x, p.y, p.image.width, p.image.height)
     }
+    g.update = function() {
+        g.scene.update()
+    }
+    // draw
+    g.draw = function() {
+        g.scene.draw()
+    }
     window.fps = 30
     var runLoop = function() {
         //开始移动
@@ -41,8 +51,43 @@ var hcGame = function() {
             runLoop()
         }, 1000/fps)
     }
-    setTimeout(function() {
-        runLoop()
-    }, 1000/fps)
+    
+    //储存载入图对象
+    var loads = []
+    var names = Object.keys(images)
+    for (var i = 0; i < names.length; i++) {
+        let name = names[i]
+        var path = images[name]
+        let img = new Image()
+        img.src = path
+        img.onload = function() {
+            g.images[name] = img
+            loads.push(1)
+            if (loads.length == names.length) {
+                g.__start()
+            }
+        }
+    }
+    g.imageByName = function(name) {
+        var img = g.images[name]
+        var image = {
+            w: img.width,
+            h: img.height,
+            image: img,
+        }
+        return image
+    }
+    g.runGame = function(scene) {
+        g.scene = scene
+        setTimeout(function() {
+            runLoop()
+        }, 1000/fps)
+    }
+    g.replaceScene = function(scene) {
+        g.scene = scene
+    }
+    g.__start = function() {
+        runCallback(g)
+    }
     return g
 }

@@ -1,7 +1,12 @@
-var Block = function(b) {
-    var p = new Gameobject('block.png', b[0], b[1])
-    p.alive = true
-    p.lives = b[2] || 1
+var Block = function(game, b) {
+    var img = game.imageByName('block')
+    var p = {
+        image: img.image,
+        x: b[0],
+        y: b[1],
+        alive: true,
+        lives: b[2] || 1,
+    }
     p.kill = function() {
         if(p.lives <= 1) {
             p.alive = false

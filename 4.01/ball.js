@@ -1,7 +1,11 @@
-var Ball = function() {
-    var p = new Gameobject('ball.png', 150, 212)
+var Ball = function(game) {
+    // var p = new Gameobject('ball.png', 150, 212)
+    var p = game.imageByName('ball')
+    p.x = 150
+    p.y = 212
     p.speedX = 5
     p.speedY = 5
+    p.action = false
     p.ballFire = function() {
         this.action = true
     }
